@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 Attractor att = new Attractor(new PVector(0, 0));
 color bgColor;
 color strokeColor;
