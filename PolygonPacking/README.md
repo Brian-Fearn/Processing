@@ -1,4 +1,4 @@
-A sketch for packing random polygons, with the twist that they are rounded and the rounding is taken into account in the packing, so there is a bit of extra space where ordinary polygons would have been "pointy." 
+A sketch for packing random polygons, with the twist that they are rounded and the rounding is taken into account in the packing, so there is a bit of extra space where ordinary polygons would have been "pointy." I use a grid to speed up the bounds-checking process when placing new polygons.
 
 Example output: 
 
