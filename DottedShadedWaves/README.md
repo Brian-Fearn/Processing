@@ -1,4 +1,4 @@
-Very simple sketch that creates some nice shaded wave figures. Based on interpolating between slightly different trig functions and using the distance between successive waves to determine the probability that a black dot will be drawn.
+Very simple sketch that creates some nice shaded wave figures. Based on calculating slightly different trig functions at different y positions and using the distance between successive waves to determine the probability that a black dot will be drawn.
 
 Some examples of output: 
 
