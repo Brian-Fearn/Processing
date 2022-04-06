@@ -1,5 +1,5 @@
-color bgColor = color(0, 0, 50);
-color strokeColor = color(200, 240, 255); //color(255, 225, 200);
+color bgColor = color(0);
+color strokeColor = color(255, 225, 200); // color(200, 240, 255); //
 PGraphics pg;
 
 void setup() {
@@ -10,7 +10,7 @@ void setup() {
 }
 
 int folds = 2;
-int n = 10;
+int n = 400;
 
 void keyPressed() {
   if (key == CODED) {
@@ -24,13 +24,14 @@ void keyPressed() {
       n = 10;
     }
     if (keyCode == RIGHT) {
-      n = 500;
+      n = 400;
     }
   }
-}
-
-void mouseClicked() {
-  
+  if (key == 'i') {
+    color temp = bgColor;
+    bgColor = strokeColor;
+    strokeColor = temp;
+  }
 }
 
 void draw() {
@@ -41,7 +42,6 @@ void draw() {
   pg.stroke(strokeColor);
   
   float inc = 2 * PI / n;
-  //float r = 10;
   PVector [] values = new PVector[n];
   PVector [] distValues = new PVector[n];
   float tFactor = sin(radians(frameCount));
@@ -53,17 +53,24 @@ void draw() {
     float x = r * cosAngle;
     float y = r * sinAngle;
     values[i] = new PVector(x, y);
-    float distR = 20 + (12.0 * tFactor * cos(folds * angle + radians(frameCount * 0.3)));
+    float distR = 20 
+      + 10.0 * tFactor * cos(folds * angle + radians(frameCount * 0.7));
     distValues[i] = new PVector(distR * cosAngle, distR * sinAngle);
   }
   
-  for (int i = 0; i < 100; i++) {
+  color col1 = color(255, 200, 100);
+  color col2 = color(200, 0, 0);
+  
+  int layers = 33;
+  for (int i = 0; i < layers; i++) {
     pg.beginShape();
     for (int j = 0; j < values.length; j++) {
       int index = (j + i * 3) % values.length;
-      pg.strokeWeight(2 + 6.0 * abs(1.0 * (frameCount * 0.005 * n + index) % n - n / 2) / (n / 2));
-      float ratio = abs(1.0 * i - 60) / 61;
-      PVector val = distValues[j]; //PVector.lerp(values[j], distValues[j], ratio);
+      pg.strokeWeight(2 + 5.0 * abs(1.0 * (frameCount * 0.005 * n + index) % n - n / 2) / (n / 2));
+      float indexFactor = abs(1.0 * j - values.length / 2) / (values.length / 2); 
+      pg.stroke(lerpColor(col1, col2, indexFactor));
+      float ratio = abs(1.0 * i - layers) / layers;
+      PVector val = PVector.lerp(values[j], distValues[j], ratio);
       PVector plot = val.copy().mult(1 + i);
       pg.vertex(plot.x, plot.y);
     }
@@ -71,5 +78,5 @@ void draw() {
   }
   pg.endDraw();
   image(pg, 0, 0, width, height);
-  println(frameRate);
+  println(frameCount / 60 + " | " + frameRate);
 }
