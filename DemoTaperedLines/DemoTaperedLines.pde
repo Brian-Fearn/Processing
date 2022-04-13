@@ -14,8 +14,8 @@ void draw() {
   pg.background(255);
   pg.stroke(0);
   pg.strokeWeight(2);
-  float xInc = 20 + 200 * (0.5 * (1 + sin(radians(frameCount * 0.5))));
-  float yInc = 20 + 200 * (0.5 * (1 + sin(radians(PI / 3 + frameCount * 0.3))));
+  float xInc = 50 + 200 * (0.5 * (1 + sin(radians(frameCount * 0.5))));
+  float yInc = 50 + 200 * (0.5 * (1 + sin(radians(PI / 3 + frameCount * 0.3))));
   for (float y = yInc; y < pg.height + yInc; y += yInc) {
     pg.beginShape();
     for (int x = 0; x <= pg.width; x += 5) {
