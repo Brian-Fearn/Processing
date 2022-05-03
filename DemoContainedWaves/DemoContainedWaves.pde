@@ -27,6 +27,7 @@ void draw() {
     PVector rimPoint2 = new PVector(-temp.x, temp.y).add(origin);
     int pointCount = int(abs(temp.x) / 1);
     float waveMag = 300.0 * waveAmp;
+    stroke(i % 2 == 0 ? 40 : 0, 50, 100);
     beginShape();
     for (int j = 0; j <= pointCount; j++) {
       PVector p = PVector.lerp(rimPoint, rimPoint2, 1.0 * j / pointCount);
