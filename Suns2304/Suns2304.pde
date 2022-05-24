@@ -16,7 +16,7 @@ void draw() {
     for (int xi = 0; xi < nx; xi++) {
       float x = xi * inc;
       float y = yi * inc;
-      float base = 1.0 * 0.5 * (1.0 + sin((1 + 0.1 * yi) * map(x, 0, height, 0, 2 * PI) - t));
+      float base = 1.0 * 0.5 * (1.0 + sin((1 + sin(t * 0.2) * 0.1 * yi) * map(x, 0, height, 0, 2 * PI) - t));
       float yDisp = pow(base, 1 + 4 * 0.5 * (1 + sin(t * 0.3)));
       fill(225, 100, 80 * (1 - base));
       square(x, y, inc);
