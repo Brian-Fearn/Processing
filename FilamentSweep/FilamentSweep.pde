@@ -2,7 +2,7 @@ ArrayList<Point> points = new ArrayList<Point>();
 ArrayList<Mover> movers = new ArrayList<Mover>();
 int moverCount = 4;
 int margin = 0;
-float minReturnRate = 0.01;
+float minReturnRate = 0.02;
 float maxReturnRate = 0.1;
 float magSqFudge = 10000.0;
 float pivotDivisor = 10.0;
@@ -12,8 +12,9 @@ float moverMaxSpeed = 8.0;
 float minLerpSpeed = 0.01;
 float maxLerpSpeed = 0.2;
 boolean randomizeReturnRate = false;
-boolean randomizeInitPositions = true;
-color copper = color(255, 175, 125, 175);
+boolean randomizeInitPositions = false;
+boolean copperColor = true;
+color copper = color(255, 175, 125, 225);
 color iceBlue = color(100, 150, 255, 175);
 
 PGraphics pg;
@@ -25,7 +26,7 @@ void setup() {
   pg.beginDraw();
   pg.ellipseMode(RADIUS);
   pg.blendMode(ADD);
-  pg.stroke(iceBlue);
+  pg.stroke(copperColor ? copper : iceBlue);
   pg.endDraw();
   initPositions(randomizeInitPositions);
   for (int i = 0; i < moverCount; i++) {
@@ -51,12 +52,12 @@ void initPositions(boolean randomize) {
     }
   }
 }
+boolean save = false;
 
 void draw() {
   pg.beginDraw();
   pg.background(0);
   pg.strokeWeight(1);
-  
   for (Mover m : movers) {
     m.move();
   }
@@ -64,12 +65,31 @@ void draw() {
     p.update();
     p.show();
   }
+  if (save) {
+    save = false;
+    pg.save("FilamentSweep" + frameCount + ".png");
+  }
   pg.endDraw();
   image(pg, 0, 0, width, height);
   if (frameCount % 60 == 0) {
-    println(frameCount / 60);
+    println(frameCount / 60 + " --- " + frameRate);
   }
-  println(frameRate);
+}
+
+void mouseClicked() {
+  if (mouseButton == LEFT) {
+    save = true;
+  } 
+}
+
+void keyPressed() {
+  if (key == CODED && keyCode == UP) {
+    randomizeReturnRate = !randomizeReturnRate;
+    randomizeInitPositions = !randomizeInitPositions;
+    copperColor = !copperColor;
+    initPositions(randomizeInitPositions);
+    pg.stroke(copperColor ? copper : iceBlue);
+  }
 }
 
 PVector randomPos() {
@@ -94,16 +114,6 @@ class Point {
   }
   
   void update() {
-    //float r = (width / 2) * pow(abs(sin(radians(frameCount))), 0.5);
-    //PVector o = new PVector(width / 2, height / 2);
-    //PVector diff = pos.copy().sub(o);
-    //PVector n = diff.copy().normalize();
-    //float magSq = abs(r * r - diff.magSq());
-    //boolean inside = r * r - diff.magSq() > 0;
-    //n.mult(magSqFudge / magSq).limit(moveMagLimit);
-    //pos.add(inside ? n.mult(-1) : n);
-    //pivot.add(n.div(pivotDivisor));
-    
     for (Mover m : movers) {
       PVector mover = new PVector(m.pos.x, m.pos.y);
       PVector diff = pos.copy().sub(mover);
@@ -133,7 +143,6 @@ class Point {
   }
   
   void show() {
-    //line(init.x, init.y, pos.x, pos.y);
     pg.line(pivot.x, pivot.y, pos.x, pos.y);
   }
 }
@@ -152,8 +161,6 @@ class Mover {
   
   void move() {
     pos.add(vel);
-    //pos.x = lerp(pos.x, dest.x, lerpSpeed.x);
-    //pos.y = lerp(pos.y, dest.y, lerpSpeed.y);
     if (pos.copy().sub(dest).magSq() < vel.magSq()) {
       dest = randomPos();
       vel = dest.copy().sub(pos).normalize().mult(random(moverMinSpeed, moverMaxSpeed));
