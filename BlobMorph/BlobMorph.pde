@@ -3,7 +3,7 @@ PGraphics pg;
 Shape sh, sh2;
 ArrayList<Point> pointList = new ArrayList<Point>();
 float maxDist;
-boolean randomizedRegression = false;
+boolean noisy = false;
 
 void setup() {
   size(900, 900, P2D);
@@ -20,7 +20,7 @@ void setup() {
     Point p = new Point(PVector.fromAngle(TAU * i / 500).mult(100).add(a));
     points.add(p);
   }
-  sh = new Shape(points);
+  sh = new Shape(points, a);
   pointList.addAll(points);
   points = new ArrayList<Point>();
   for (int i = 0; i <= 1000; i++) {
@@ -28,7 +28,7 @@ void setup() {
     points.add(p);
   }
   pointList.addAll(points);
-  sh2 = new Shape(points);
+  sh2 = new Shape(points, b);
 }
 
 void draw() {
@@ -36,27 +36,32 @@ void draw() {
   pg.beginDraw();
   pg.background(255);
   pg.noStroke();
-  pg.fill(255, 0, 0);
-  pg.circle(m.x, m.y, 10);
   pg.fill(0);
+  sh.repel(m);
+  sh2.repel(m);
   for (Point p : pointList) {
-    p.repel(m);
-    p.regress();
+    if (!mousePressed) {    
+      p.regress();
+    } else {
+      //p.repel(m);
+    }
   }
   sh.show();
   sh2.show();
+  pg.fill(255, 0, 0);
+  pg.circle(m.x, m.y, 10);
   pg.endDraw();
   image(pg, 0, 0, width, height);
   println(frameCount / 60);
 }
 
 void mouseClicked() {
-  randomizedRegression = !randomizedRegression;
+  noisy = !noisy;
 }
 
 class Point {
   
-  PVector init, p;
+  PVector init, init2, p;
   float lerpRate;
   
   Point(PVector init) {
@@ -69,12 +74,16 @@ class Point {
     PVector diff = p.copy().sub(m);
     PVector n = diff.copy().normalize();
     float f = pow(1 - diff.mag() / maxDist, 5);
-    p.add(n.mult(f * 4));
+    if (noisy) {
+      n = PVector.fromAngle(TAU * 2 * noise(init.x * 0.01, init.y * 0.01)).mult(f * 5);
+    } else {
+      n.mult(f * 5);
+    }
+    p.add(n);
   }
   
   void regress() {
-    float rate = randomizedRegression ? lerpRate : 0.015;
-    p.lerp(init, rate);
+    p.lerp(init, 0.055);
   }
   
 }
@@ -82,9 +91,23 @@ class Point {
 class Shape {
   
   ArrayList<Point> points;
+  PVector c;
   
-  Shape(ArrayList<Point> points) {
+  Shape(ArrayList<Point> points, PVector c) {
     this.points = points;
+    this.c = c;
+  }
+  
+  void repel(PVector m) {
+    PVector diff = c.copy().sub(m);
+    PVector n = diff.copy().normalize();
+    float f = pow(1 - diff.mag() / maxDist, 5);
+    PVector norm = n.copy().mult(f * 5);
+    c.add(norm);
+    for (Point p : points) {
+      p.init.add(norm);
+      p.repel(m);
+    }
   }
   
   void show() {
